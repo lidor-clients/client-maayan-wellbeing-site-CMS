@@ -10,8 +10,8 @@ import type { Request, Response, NextFunction } from "express";
 import dotenv from "dotenv";
 
 dotenv.config();
+
 const __filename = fileURLToPath(import.meta.url);
-console.log("BACKEND ENTRY FILE:", __filename);
 const __dirname = path.dirname(__filename);
 
 const app = express();
@@ -22,6 +22,10 @@ const UPLOADS_DIR = path.join(__dirname, "uploads");
 
 // ===== CONFIG =====
 const CMS_PASSWORD = process.env.CMS_PASSWORD;
+if (!CMS_PASSWORD) {
+  throw new Error("CMS_PASSWORD is missing. Set it in .env or Render env vars.");
+}
+
 const DEBUG_AUTH = process.env.DEBUG_AUTH === "1";
 
 // ===== SIMPLE LOGGER =====
@@ -64,37 +68,7 @@ app.use(cors());
 app.use(express.json({ limit: "2mb" }));
 
 app.get("/__health", (_req, res) => {
-  res.json({ ok: true, file: __filename, time: new Date().toISOString() });
-});
-
-// Request logger
-app.use((req, res, next) => {
-  const start = Date.now();
-  const authHeader = req.headers.authorization ?? "";
-  const hasAuth = authHeader.toLowerCase().startsWith("bearer ");
-
-  if (DEBUG_AUTH) {
-    log("HTTP_IN", {
-      method: req.method,
-      url: req.originalUrl,
-      ip: req.ip,
-      hasAuth,
-      contentType: req.headers["content-type"],
-    });
-  }
-
-  res.on("finish", () => {
-    if (DEBUG_AUTH) {
-      log("HTTP_OUT", {
-        method: req.method,
-        url: req.originalUrl,
-        status: res.statusCode,
-        ms: Date.now() - start,
-      });
-    }
-  });
-
-  next();
+  res.json({ ok: true, time: new Date().toISOString() });
 });
 
 // Serve uploads
@@ -111,20 +85,11 @@ function getBearerToken(req: Request): string | null {
 function requireAuth(req: Request, res: Response, next: NextFunction) {
   const token = getBearerToken(req);
 
-  if (DEBUG_AUTH) {
-    log("AUTH_CHECK", {
-      url: req.originalUrl,
-      hasToken: Boolean(token),
-      tokenMasked: maskToken(token),
-      sessionCount: activeSessions.size,
-      tokenInSet: token ? activeSessions.has(token) : false,
-    });
-  }
-
   if (!token || !activeSessions.has(token)) {
     res.status(401).json({ error: "Unauthorized" });
     return;
   }
+
   next();
 }
 
@@ -148,8 +113,7 @@ function safeReadJson(filePath: string): unknown | null {
   if (!fs.existsSync(filePath)) return null;
   try {
     return JSON.parse(fs.readFileSync(filePath, "utf-8"));
-  } catch (err) {
-    log("JSON_PARSE_ERROR", { filePath, err: String(err) });
+  } catch {
     return null;
   }
 }
@@ -157,15 +121,6 @@ function safeReadJson(filePath: string): unknown | null {
 // ===== AUTH ROUTES =====
 app.post("/api/auth/login", (req, res) => {
   const password = String(req.body?.password ?? "");
-
-  if (DEBUG_AUTH) {
-    log("LOGIN_ATTEMPT", {
-      ip: req.ip,
-      hasPassword: password.length > 0,
-      passwordLen: password.length,
-      match: password === CMS_PASSWORD,
-    });
-  }
 
   if (password !== CMS_PASSWORD) {
     res.status(401).json({ error: "סיסמה שגויה" });
@@ -175,43 +130,18 @@ app.post("/api/auth/login", (req, res) => {
   const token = crypto.randomUUID();
   activeSessions.add(token);
 
-  if (DEBUG_AUTH) {
-    log("LOGIN_SUCCESS", {
-      tokenMasked: maskToken(token),
-      sessionCount: activeSessions.size,
-    });
-  }
-
   res.json({ token });
 });
 
 app.post("/api/auth/logout", (req, res) => {
   const token = getBearerToken(req);
-  const existed = token ? activeSessions.delete(token) : false;
-
-  if (DEBUG_AUTH) {
-    log("LOGOUT", {
-      tokenMasked: maskToken(token),
-      existed,
-      sessionCount: activeSessions.size,
-    });
-  }
-
+  if (token) activeSessions.delete(token);
   res.json({ success: true });
 });
 
 app.post("/api/auth/verify", (req, res) => {
   const token = getBearerToken(req);
   const valid = Boolean(token && activeSessions.has(token));
-
-  if (DEBUG_AUTH) {
-    log("VERIFY", {
-      tokenMasked: maskToken(token),
-      valid,
-      sessionCount: activeSessions.size,
-    });
-  }
-
   res.json({ valid });
 });
 
@@ -262,13 +192,6 @@ app.put(
     const filePath = path.join(DATA_DIR, `${section}.json`);
     fs.writeFileSync(filePath, JSON.stringify(req.body ?? {}, null, 2), "utf-8");
 
-    if (DEBUG_AUTH) {
-      log("CONTENT_UPDATED", {
-        section,
-        byToken: maskToken(getBearerToken(req)),
-      });
-    }
-
     res.json({ success: true });
   }
 );
@@ -280,40 +203,24 @@ app.post("/api/upload", requireAuth, upload.single("image"), (req, res) => {
     return;
   }
 
-  if (DEBUG_AUTH) {
-    log("UPLOAD_SUCCESS", {
-      filename: req.file.filename,
-      size: req.file.size,
-      byToken: maskToken(getBearerToken(req)),
-    });
-  }
-
   res.json({ url: `/uploads/${req.file.filename}` });
 });
 
 // ===== GLOBAL ERROR HANDLER =====
 app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
-  log("UNHANDLED_ERROR", { err: String(err) });
+  console.error("UNHANDLED_ERROR", err);
   res.status(500).json({ error: "Internal Server Error" });
 });
 
+// ===== PRODUCTION STATIC =====
+if (process.env.NODE_ENV === "production") {
+  const clientDist = path.join(__dirname, "..", "dist");
+  app.use(express.static(clientDist));
 
-function printRoutes() {
-  const router = (app as any)._router;
-  const stack = router?.stack ?? [];
-
-  const routes = stack
-    .filter((l: any) => l.route)
-    .map((l: any) => {
-      const methods = Object.keys(l.route.methods)
-        .map((m) => m.toUpperCase())
-        .join(",");
-      return `${methods} ${l.route.path}`;
-    });
-
-  console.log("ROUTES LOADED:", routes.length ? routes : "NONE");
+  app.get("*", (_req, res) => {
+    res.sendFile(path.join(clientDist, "index.html"));
+  });
 }
-printRoutes();
 
 // ===== START =====
 app.listen(PORT, () => {
