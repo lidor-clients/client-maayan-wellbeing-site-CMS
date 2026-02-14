@@ -212,15 +212,7 @@ app.use((err: unknown, _req: Request, res: Response, _next: NextFunction) => {
   res.status(500).json({ error: "Internal Server Error" });
 });
 
-// ===== PRODUCTION STATIC =====
-if (process.env.NODE_ENV === "production") {
-  const clientDist = path.join(__dirname, "..", "dist");
-  app.use(express.static(clientDist));
 
-  app.get("/*", (_req, res) => {
-    res.sendFile(path.join(clientDist, "index.html"));
-  });
-}
 
 // ===== START =====
 app.listen(PORT, () => {
