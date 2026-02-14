@@ -1,0 +1,25 @@
+{
+  "badge": "בריאות בפשטות",
+  "title": "היי, שמחה שדרכנו מצטלבות",
+  "subtitle": "אני ",
+  "subtitleHighlight": "מעין",
+  "ctaPrimary": {
+    "text": "לשירותים שלי",
+    "href": "#services"
+  },
+  "ctaSecondary": {
+    "text": "מתנה חינמית",
+    "href": "#gifts"
+  },
+  "trustIndicators": [
+    {
+      "text": "ליווי אישי ומקצועי",
+      "icon": "Heart"
+    }
+  ],
+  "imagePlaceholder": {
+    "title": "תמונה של מעין",
+    "subtitle": "יתווסף בקרוב"
+  },
+  "image": "/uploads/1771069399239-563d6e403b39.jpg"
+}

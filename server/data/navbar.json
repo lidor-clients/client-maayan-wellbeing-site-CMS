@@ -1,0 +1,10 @@
+{
+  "logoText": "מעין גבסו רג'ואן",
+  "links": [
+    { "name": "בית", "href": "#home" },
+    { "name": "אודות", "href": "#about" },
+    { "name": "שירותים", "href": "#services" },
+    { "name": "מתנות", "href": "#gifts" },
+    { "name": "צור קשר", "href": "#contact" }
+  ]
+}

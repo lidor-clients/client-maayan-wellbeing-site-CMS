@@ -1,0 +1,76 @@
+@import "tailwindcss";
+
+@theme {
+  /* Brand Colors - Calming Wellness Palette */
+  --color-sage-50: #f6f7f4;
+  --color-sage-100: #e8ebe3;
+  --color-sage-200: #d1d7c7;
+  --color-sage-300: #b3bda3;
+  --color-sage-400: #95a37f;
+  --color-sage-500: #7a8a63;
+  --color-sage-600: #5f6d4d;
+  --color-sage-700: #4a553d;
+  --color-sage-800: #3d4534;
+  --color-sage-900: #343b2d;
+
+  --color-warm-50: #fdfcfb;
+  --color-warm-100: #f9f6f2;
+  --color-warm-200: #f2ebe1;
+  --color-warm-300: #e8dbc9;
+  --color-warm-400: #d9c4a8;
+  --color-warm-500: #c9a987;
+  --color-warm-600: #b58f6a;
+  --color-warm-700: #97745a;
+  --color-warm-800: #7c604d;
+  --color-warm-900: #665042;
+
+  --color-blush-50: #fdf8f6;
+  --color-blush-100: #faf0ec;
+  --color-blush-200: #f5dfd6;
+  --color-blush-300: #ecc8b8;
+  --color-blush-400: #e0a890;
+  --color-blush-500: #d4896d;
+  --color-blush-600: #c26f52;
+  --color-blush-700: #a25a44;
+  --color-blush-800: #864b3b;
+  --color-blush-900: #704034;
+
+  /* Font families */
+  --font-hebrew: 'Heebo', 'Rubik', system-ui, sans-serif;
+}
+
+/* Base styles */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-hebrew);
+  line-height: 1.7;
+  color: #374151;
+  background-color: var(--color-warm-50);
+}
+
+/* Custom utilities for RTL */
+.text-balance {
+  text-wrap: balance;
+}
+
+/* CMS Panel slide-in animation */
+@keyframes slide-in {
+  from {
+    transform: translateX(-100%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+
+.animate-slide-in {
+  animation: slide-in 0.3s ease-out;
+}

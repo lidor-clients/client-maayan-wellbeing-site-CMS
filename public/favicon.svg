@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+  <!-- Leaf/wellness symbol in sage green -->
+  <defs>
+    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#7a8a63"/>
+      <stop offset="100%" style="stop-color:#5f6d4d"/>
+    </linearGradient>
+  </defs>
+  <!-- Main leaf shape -->
+  <path d="M16 2C16 2 8 8 8 16C8 22 11 26 16 28C21 26 24 22 24 16C24 8 16 2 16 2Z" fill="url(#leafGradient)"/>
+  <!-- Center vein -->
+  <path d="M16 6V24" stroke="#f9f6f2" stroke-width="1.5" stroke-linecap="round"/>
+  <!-- Side veins -->
+  <path d="M16 10L12 13M16 14L11 17M16 18L12 21" stroke="#f9f6f2" stroke-width="1" stroke-linecap="round"/>
+  <path d="M16 10L20 13M16 14L21 17M16 18L20 21" stroke="#f9f6f2" stroke-width="1" stroke-linecap="round"/>
+</svg>

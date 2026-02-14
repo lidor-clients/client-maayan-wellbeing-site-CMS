@@ -1,0 +1,28 @@
+{
+  "brandName": "מעין גבסו רג'ואן",
+  "brandDescription": "מלווה נשים לחזור להקשבה פנימית, ומתוכה לשפר את הבריאות, איכות החיים והקשרים בחייהן.",
+  "quickLinksTitle": "קישורים מהירים",
+  "quickLinks": [
+    {
+      "name": "אודות",
+      "href": "#about"
+    },
+    {
+      "name": "שירותים",
+      "href": "#services"
+    },
+    {
+      "name": "מתנות חינמיות",
+      "href": "#gifts"
+    },
+    {
+      "name": "צור קשר",
+      "href": "https://make.powerautomate.com/environments/fbf16d9d-49f0-4d48-8f96-b662618a4996/flows/6ea3a2e9-9dca-d8c5-5d91-786ecccb1006/details"
+    }
+  ],
+  "contactTitle": "צרי קשר",
+  "email": "maayan@example.com",
+  "whatsappNumber": "972501234567",
+  "instagramUrl": "https://instagram.com",
+  "facebookUrl": "https://facebook.com"
+}
